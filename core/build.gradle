@@ -8,6 +8,16 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+  
+  // JUnit 5 для тестирования
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+  testImplementation 'org.mockito:mockito-core:5.1.1'
+  testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+}
+
+test {
+  useJUnitPlatform()
 }
 
 jar {

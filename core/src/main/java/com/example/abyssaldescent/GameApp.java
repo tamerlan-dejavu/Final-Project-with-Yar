@@ -1,32 +1,58 @@
 package com.example.abyssaldescent;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.example.abyssaldescent.audio.AudioManager;
+import com.example.abyssaldescent.core.ScreenManager;
+import com.example.abyssaldescent.event.EventBus;
+import com.example.abyssaldescent.screen.MenuScreen;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class GameApp extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+/**
+ * Точка входа в приложение.
+ * Реализует ApplicationListener через Game (libGDX).
+ *
+ * Паттерны инициализируемые здесь:
+ *   - Singleton : AudioManager, EventBus
+ *   - Facade    : AudioManager скрывает libGDX Audio API
+ */
+public class GameApp extends Game {
+
+    private ScreenManager screenManager;
+    private AssetManager assetManager;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
-    }
+        // Асинхронная загрузка ресурсов
+        assetManager = new AssetManager();
 
-    @Override
-    public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+        // Инициализация Singleton-ов
+        EventBus.getInstance();
+        AudioManager.getInstance(assetManager);
+
+        // Менеджер экранов
+        screenManager = new ScreenManager(this);
+
+        // Первый экран — главное меню
+        screenManager.showScreen(
+            new MenuScreen(screenManager, assetManager)
+        );
+
+        Gdx.app.log("GameApp", "Abyssal Descent — initialized");
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        super.dispose();
+        assetManager.dispose();
+        Gdx.app.log("GameApp", "Resources disposed");
+    }
+
+    public ScreenManager getScreenManager() {
+        return screenManager;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
     }
 }
